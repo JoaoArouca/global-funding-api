@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model funding {
+  id              String         @id @default(uuid())
+  title           String
+  countries       Country[]
+  region          Region[]
+  institution     String
+  key             String         @unique
+  program         String?
+  call            String?
+  supportType     String
+  organizations   Organization[]
+  sector          Sector[]
+  requiresPartner String
+  partnerType     PartnerType[]
+  TRLmin          String
+  TRLmax          String
+  technologies    Technology[]
+  term            String
+  currency        String         @default("BRL")
+  minValue        String
+  maxValue        String
+  supportTax      String
+  duration        String
+  tax             String
+  shortage        String
+  amortization    String
+  isESG           Boolean        @default(false)
+  link            String
+  status          String
+  lastRelease     String
+  objective       String?
+  elegibility     String?
+  expenses        String?
+  observation     String?
+  created_at      DateTime       @default(now())
+
+  @@map("funding")
+}
+
+model Country {
+  id        String  @id @default(uuid())
+  name      String
+  funding   funding @relation(fields: [fundingId], references: [id])
+  fundingId String
+}
+
+model Region {
+  id   String @id @default(uuid())
+  name String
+
+  funding   funding? @relation(fields: [fundingId], references: [id])
+  fundingId String?
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  funding   funding? @relation(fields: [fundingId], references: [id])
+  fundingId String?
+}
+
+model Sector {
+  id        String   @id @default(uuid())
+  name      String
+  funding   funding? @relation(fields: [fundingId], references: [id])
+  fundingId String?
+}
+
+model PartnerType {
+  id        String   @id @default(uuid())
+  name      String
+  funding   funding? @relation(fields: [fundingId], references: [id])
+  fundingId String?
+}
+
+model Technology {
+  id        String   @id @default(uuid())
+  name      String
+  funding   funding? @relation(fields: [fundingId], references: [id])
+  fundingId String?
+}
