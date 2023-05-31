@@ -13,6 +13,7 @@ datasource db {
 model funding {
   id              String         @id @default(uuid())
   title           String
+  // countries       Country[]
   countries       Country[]
   region          Region[]
   institution     String
@@ -50,10 +51,10 @@ model funding {
 }
 
 model Country {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  funding   funding @relation(fields: [fundingId], references: [id])
-  fundingId String
+  funding   funding? @relation(fields: [fundingId], references: [id])
+  fundingId String?
 }
 
 model Region {
