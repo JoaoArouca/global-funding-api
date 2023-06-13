@@ -9,6 +9,7 @@ import { MakeGetSectorsUseCase } from '../../../services/factories/make-get-sect
 import { MakeGetTechnologiesUseCase } from '../../../services/factories/make-get-technologies.use-case'
 import { FundingAlreadyExistsError } from '../../../services/errors/funding-already-exists.error'
 import { MakeCreateFundingUseCase } from '../../../services/factories/make-create-funding.use-case'
+import { MakeHash } from '../../../utils/encrypt'
 
 export async function FundingController(
   request: FastifyRequest,
@@ -97,6 +98,11 @@ export async function FundingController(
     const key = program ? program.concat(call || '') : (call as string)
     const hashKey = CryptoJS.SHA256(key).toString()
 
+    const hashObjective = MakeHash(objective)
+    const hashElegibility = MakeHash(elegibility)
+    const hashExpenses = MakeHash(expenses)
+    const hashObservation = MakeHash(observation)
+
     const createFundingUseCase = MakeCreateFundingUseCase()
 
     const fund = await createFundingUseCase.execute({
@@ -121,10 +127,10 @@ export async function FundingController(
       link,
       status,
       lastRelease,
-      objective,
-      elegibility,
-      expenses,
-      observation,
+      objective: hashObjective,
+      elegibility: hashElegibility,
+      expenses: hashExpenses,
+      observation: hashObservation,
       countriesInput,
       regionInput,
       orgsInput,
