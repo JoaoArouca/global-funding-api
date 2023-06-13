@@ -13,7 +13,6 @@ datasource db {
 model funding {
   id              String         @id @default(uuid())
   title           String
-  // countries       Country[]
   countries       Country[]
   region          Region[]
   institution     String
