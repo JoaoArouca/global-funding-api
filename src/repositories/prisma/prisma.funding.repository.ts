@@ -28,4 +28,14 @@ export class PrismaFundingRepository implements FundingRepository {
 
     return newFunding
   }
+
+  async getById(id: string): Promise<funding | null> {
+    const funding = await prisma.funding.findFirst({
+      where: {
+        id,
+      },
+    })
+
+    return funding
+  }
 }

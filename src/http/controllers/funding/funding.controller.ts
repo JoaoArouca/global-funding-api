@@ -10,6 +10,10 @@ import { MakeGetTechnologiesUseCase } from '../../../services/factories/make-get
 import { FundingAlreadyExistsError } from '../../../services/errors/funding-already-exists.error'
 import { MakeCreateFundingUseCase } from '../../../services/factories/make-create-funding.use-case'
 import { MakeHash } from '../../../utils/encrypt'
+import { env } from '../../../env'
+import { MakeCreateUserFundingResponsibleUseCase } from '../../../services/factories/make-create-user-funding-responsible.use-case'
+import { FundingNotFoundError } from '../../../services/errors/funding-not-found.error'
+import { UserNotFoundError } from '../../../services/errors/user-not-found.error'
 
 export async function FundingController(
   request: FastifyRequest,
@@ -88,7 +92,6 @@ export async function FundingController(
     const getSectorsUseCase = MakeGetSectorsUseCase()
     const getTechnologiesUseCase = MakeGetTechnologiesUseCase()
     const getPartnerTypesUseCase = MakeGetPartnerTypesUseCase()
-
     const countriesInput = await getCountriesUseCase.execute(countries)
     const regionInput = await getRegionsUseCase.execute(region)
     const orgsInput = await getOrgsUseCase.execute(organizations)
@@ -97,12 +100,10 @@ export async function FundingController(
     const partnersInput = await getPartnerTypesUseCase.execute(partnerType)
     const key = program ? program.concat(call || '') : (call as string)
     const hashKey = CryptoJS.SHA256(key).toString()
-
-    const hashObjective = MakeHash(objective)
-    const hashElegibility = MakeHash(elegibility)
-    const hashExpenses = MakeHash(expenses)
-    const hashObservation = MakeHash(observation)
-
+    const hashObjective = MakeHash(objective, env.HASH_KEY)
+    const hashElegibility = MakeHash(elegibility, env.HASH_KEY)
+    const hashExpenses = MakeHash(expenses, env.HASH_KEY)
+    const hashObservation = MakeHash(observation, env.HASH_KEY)
     const createFundingUseCase = MakeCreateFundingUseCase()
 
     const fund = await createFundingUseCase.execute({
@@ -139,10 +140,28 @@ export async function FundingController(
       techInput,
     })
 
+    const createUserFundingResponsibleUseCase =
+      MakeCreateUserFundingResponsibleUseCase()
+
+    const { preUser } = request
+
+    await createUserFundingResponsibleUseCase.execute({
+      userId: preUser.id,
+      fundingId: fund.funding.id,
+    })
+
     return reply.status(201).send(fund)
   } catch (error) {
     if (error instanceof FundingAlreadyExistsError) {
       return reply.status(409).send({ message: error.message })
+    }
+
+    if (error instanceof FundingNotFoundError) {
+      return reply.status(404).send({ message: error.message })
+    }
+
+    if (error instanceof UserNotFoundError) {
+      return reply.status(404).send({ message: error.message })
     }
 
     return reply.status(500).send()
