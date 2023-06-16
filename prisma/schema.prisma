@@ -11,12 +11,12 @@ datasource db {
 }
 
 model funding {
-  id                     String                   @id @default(uuid())
+  id                     String               @id @default(uuid())
   title                  String
   countries              Country[]
   region                 Region[]
   institution            String
-  key                    String                   @unique
+  key                    String               @unique
   program                String?
   call                   String?
   supportType            String
@@ -28,7 +28,7 @@ model funding {
   TRLmax                 String
   technologies           Technology[]
   term                   String
-  currency               String                   @default("BRL")
+  currency               String               @default("BRL")
   minValue               String
   maxValue               String
   supportTax             String
@@ -36,7 +36,7 @@ model funding {
   tax                    String
   shortage               String
   amortization           String
-  isESG                  Boolean                  @default(false)
+  isESG                  Boolean              @default(false)
   link                   String
   status                 String
   lastRelease            String
@@ -44,86 +44,68 @@ model funding {
   elegibility            String?
   expenses               String?
   observation            String?
-  created_at             DateTime                 @default(now())
-  userFundingResponsible userFundingResponsible[]
-  preUser                preUser?                 @relation(fields: [preUserId], references: [id])
-  preUserId              String?
-  userFundingReviewer    userFundingReviewer?     @relation(fields: [userFundingReviewerId], references: [id])
-  userFundingReviewerId  String?
+  created_at             DateTime             @default(now())
+  user_responsible       preUser              @relation(fields: [preUserId], references: [id])
+  preUserId              String
+  userFundingReviewer    userFundingReviewer? @relation(fields: [userFundingReviewer_id], references: [id])
+  userFundingReviewer_id String?
 
   @@map("funding")
 }
 
 model Country {
-  id        String   @id @default(uuid())
-  name      String
-  funding   funding? @relation(fields: [fundingId], references: [id])
-  fundingId String?
+  id      String    @id @default(uuid())
+  name    String
+  funding funding[]
 }
 
 model Region {
-  id   String @id @default(uuid())
-  name String
-
-  funding   funding? @relation(fields: [fundingId], references: [id])
-  fundingId String?
+  id      String    @id @default(uuid())
+  name    String
+  funding funding[]
 }
 
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  funding   funding? @relation(fields: [fundingId], references: [id])
-  fundingId String?
+  id      String    @id @default(uuid())
+  name    String
+  funding funding[]
 }
 
 model Sector {
-  id        String   @id @default(uuid())
-  name      String
-  funding   funding? @relation(fields: [fundingId], references: [id])
-  fundingId String?
+  id      String    @id @default(uuid())
+  name    String
+  funding funding[]
 }
 
 model PartnerType {
-  id        String   @id @default(uuid())
-  name      String
-  funding   funding? @relation(fields: [fundingId], references: [id])
-  fundingId String?
+  id      String    @id @default(uuid())
+  name    String
+  funding funding[]
 }
 
 model Technology {
-  id        String   @id @default(uuid())
-  name      String
-  funding   funding? @relation(fields: [fundingId], references: [id])
-  fundingId String?
+  id      String    @id @default(uuid())
+  name    String
+  funding funding[]
 }
 
 model preUser {
-  id                     String                   @id @default(uuid())
-  name                   String
-  email                  String                   @unique
-  isActive               Boolean
-  isReviewer             Boolean
-  created_at             DateTime                 @default(now())
-  userFundingResponsible userFundingResponsible[]
-  funding                funding[]
-  userFundingReviewer    userFundingReviewer[]
+  id                  String                @id @default(uuid())
+  name                String
+  email               String                @unique
+  isActive            Boolean
+  isReviewer          Boolean
+  created_at          DateTime              @default(now())
+  fundings            funding[]
+  userFundingReviewer userFundingReviewer[]
 
   @@map("preusers")
-}
-
-model userFundingResponsible {
-  id         String  @id @default(uuid())
-  preuser_id preUser @relation(fields: [preUserId], references: [id])
-  preUserId  String
-
-  funding_id funding @relation(fields: [fundingId], references: [id])
-  fundingId  String
 }
 
 model userFundingReviewer {
   id         String  @id @default(uuid())
   preuser_id preUser @relation(fields: [preUserId], references: [id])
 
-  funding_ids funding[]
-  preUserId   String
+  funding_id funding[]
+  preUserId  String
 }
