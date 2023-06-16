@@ -23,6 +23,7 @@ export class PrismaFundingRepository implements FundingRepository {
         region: true,
         sector: true,
         technologies: true,
+        user_responsible: true,
       },
     })
 

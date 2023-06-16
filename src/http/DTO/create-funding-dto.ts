@@ -36,4 +36,5 @@ export interface CreateFundingDTO {
   sectorInput: AttributeList
   partnersInput: AttributeList
   techInput: AttributeList
+  responsibleId: string
 }

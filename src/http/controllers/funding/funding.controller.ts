@@ -11,9 +11,9 @@ import { FundingAlreadyExistsError } from '../../../services/errors/funding-alre
 import { MakeCreateFundingUseCase } from '../../../services/factories/make-create-funding.use-case'
 import { MakeHash } from '../../../utils/encrypt'
 import { env } from '../../../env'
-import { MakeCreateUserFundingResponsibleUseCase } from '../../../services/factories/make-create-user-funding-responsible.use-case'
 import { FundingNotFoundError } from '../../../services/errors/funding-not-found.error'
 import { UserNotFoundError } from '../../../services/errors/user-not-found.error'
+import { MakeGetUserByIdUseCase } from '../../../services/factories/make-get-preuser-by-id.use-case'
 
 export async function FundingController(
   request: FastifyRequest,
@@ -85,6 +85,8 @@ export async function FundingController(
     technologies,
   } = fundingBodySchema.parse(request.body)
 
+  const { preUser } = request
+
   try {
     const getCountriesUseCase = MakeGetCountriesUseCase()
     const getRegionsUseCase = MakeGetRegionsUseCase()
@@ -105,6 +107,10 @@ export async function FundingController(
     const hashExpenses = MakeHash(expenses, env.HASH_KEY)
     const hashObservation = MakeHash(observation, env.HASH_KEY)
     const createFundingUseCase = MakeCreateFundingUseCase()
+
+    const getUserByIdUseCase = MakeGetUserByIdUseCase()
+
+    const responsibleId = await getUserByIdUseCase.execute(preUser.id)
 
     const fund = await createFundingUseCase.execute({
       hashKey,
@@ -138,16 +144,7 @@ export async function FundingController(
       sectorInput,
       partnersInput,
       techInput,
-    })
-
-    const createUserFundingResponsibleUseCase =
-      MakeCreateUserFundingResponsibleUseCase()
-
-    const { preUser } = request
-
-    await createUserFundingResponsibleUseCase.execute({
-      userId: preUser.id,
-      fundingId: fund.funding.id,
+      responsibleId: responsibleId.id,
     })
 
     return reply.status(201).send(fund)

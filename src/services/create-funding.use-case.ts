@@ -37,6 +37,7 @@ export class CreateFundingUseCase {
     sectorInput,
     partnersInput,
     techInput,
+    responsibleId,
   }: CreateFundingDTO) {
     const fundingWithSameKey = await this.fundingRepository.findByKey(hashKey)
 
@@ -70,6 +71,9 @@ export class CreateFundingUseCase {
       elegibility,
       expenses,
       observation,
+      user_responsible: {
+        connect: { id: responsibleId },
+      },
       countries: {
         connect: countriesInput,
       },
