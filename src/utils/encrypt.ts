@@ -1,8 +1,8 @@
 import CryptoJS from 'crypto-js'
 
-export function MakeHash(text: string | null): string | null {
+export function MakeHash(text: string | null, key: string): string | null {
   if (text !== null) {
-    const textHashed = CryptoJS.AES.encrypt(text, 'senha').toString()
+    const textHashed = CryptoJS.AES.encrypt(text, key).toString()
     return textHashed
   } else {
     const textHashed = text
