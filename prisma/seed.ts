@@ -211,6 +211,28 @@ async function seed() {
       })
     }),
   )
+  await prisma.preUser.createMany({
+    data: [
+      {
+        email: 'joao.arouca@abgi-brasil.com',
+        isActive: true,
+        isReviewer: false,
+        name: 'João Victor',
+      },
+      {
+        email: 'jarouca21@gmail.com',
+        isActive: true,
+        isReviewer: true,
+        name: 'João',
+      },
+      {
+        email: 'joão@email.com',
+        isActive: true,
+        isReviewer: false,
+        name: 'joão victor arouca',
+      },
+    ],
+  })
 }
 
 seed().catch((e) => {

@@ -11,40 +11,45 @@ datasource db {
 }
 
 model funding {
-  id              String         @id @default(uuid())
-  title           String
-  countries       Country[]
-  region          Region[]
-  institution     String
-  key             String         @unique
-  program         String?
-  call            String?
-  supportType     String
-  organizations   Organization[]
-  sector          Sector[]
-  requiresPartner String
-  partnerType     PartnerType[]
-  TRLmin          String
-  TRLmax          String
-  technologies    Technology[]
-  term            String
-  currency        String         @default("BRL")
-  minValue        String
-  maxValue        String
-  supportTax      String
-  duration        String
-  tax             String
-  shortage        String
-  amortization    String
-  isESG           Boolean        @default(false)
-  link            String
-  status          String
-  lastRelease     String
-  objective       String?
-  elegibility     String?
-  expenses        String?
-  observation     String?
-  created_at      DateTime       @default(now())
+  id                     String                   @id @default(uuid())
+  title                  String
+  countries              Country[]
+  region                 Region[]
+  institution            String
+  key                    String                   @unique
+  program                String?
+  call                   String?
+  supportType            String
+  organizations          Organization[]
+  sector                 Sector[]
+  requiresPartner        String
+  partnerType            PartnerType[]
+  TRLmin                 String
+  TRLmax                 String
+  technologies           Technology[]
+  term                   String
+  currency               String                   @default("BRL")
+  minValue               String
+  maxValue               String
+  supportTax             String
+  duration               String
+  tax                    String
+  shortage               String
+  amortization           String
+  isESG                  Boolean                  @default(false)
+  link                   String
+  status                 String
+  lastRelease            String
+  objective              String?
+  elegibility            String?
+  expenses               String?
+  observation            String?
+  created_at             DateTime                 @default(now())
+  userFundingResponsible userFundingResponsible[]
+  preUser                preUser?                 @relation(fields: [preUserId], references: [id])
+  preUserId              String?
+  userFundingReviewer    userFundingReviewer?     @relation(fields: [userFundingReviewerId], references: [id])
+  userFundingReviewerId  String?
 
   @@map("funding")
 }
@@ -90,4 +95,35 @@ model Technology {
   name      String
   funding   funding? @relation(fields: [fundingId], references: [id])
   fundingId String?
+}
+
+model preUser {
+  id                     String                   @id @default(uuid())
+  name                   String
+  email                  String                   @unique
+  isActive               Boolean
+  isReviewer             Boolean
+  created_at             DateTime                 @default(now())
+  userFundingResponsible userFundingResponsible[]
+  funding                funding[]
+  userFundingReviewer    userFundingReviewer[]
+
+  @@map("preusers")
+}
+
+model userFundingResponsible {
+  id         String  @id @default(uuid())
+  preuser_id preUser @relation(fields: [preUserId], references: [id])
+  preUserId  String
+
+  funding_id funding @relation(fields: [fundingId], references: [id])
+  fundingId  String
+}
+
+model userFundingReviewer {
+  id         String  @id @default(uuid())
+  preuser_id preUser @relation(fields: [preUserId], references: [id])
+
+  funding_ids funding[]
+  preUserId   String
 }
