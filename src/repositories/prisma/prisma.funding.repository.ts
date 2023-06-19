@@ -39,4 +39,20 @@ export class PrismaFundingRepository implements FundingRepository {
 
     return funding
   }
+
+  async getAll(): Promise<funding[] | null> {
+    const fundings = await prisma.funding.findMany({
+      include: {
+        countries: true,
+        organizations: true,
+        partnerType: true,
+        region: true,
+        sector: true,
+        technologies: true,
+        user_responsible: true,
+      },
+    })
+
+    return fundings
+  }
 }
